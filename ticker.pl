@@ -3,12 +3,26 @@ use strict;
 use warnings;
 no feature qw/indirect/;
 use Term::ANSIColor;
+use Getopt::Std;
 use POSIX qw|strftime tzset|;
 use LWP::UserAgent ();
 use URI::Escape;
 use JSON::XS;
 
+my $VERSION='v1.0.0';
 my @symbols;
+
+my $opts={};
+getopts('vh',$opts);
+
+if ($opts->{'v'}) {
+	print $VERSION,"\n";
+	exit(0);
+
+} elsif ($opts->{'h'}) {
+	exec("perldoc -T $0");
+	exit;
+}
 
 for (@ARGV) {
 	/[^A-Z0-9-=^]+/ && next;
@@ -62,7 +76,7 @@ for my $h (@$co) {
 	$closed =$h->{'marketState'} eq 'CLOSED'?1:0;
 	$time = $h->{regularMarketTime};
 
-	my $prefix=$pre?'pre':'regular';
+	my $prefix=($pre eq 'PRE' and exists $h->{'preMarketPrice'})?'pre':'regular';
 	my $price=$h->{"${prefix}MarketPrice"};
 	my $change=$h->{"${prefix}MarketChange"};
 	my $changep=$h->{"${prefix}MarketChangePercent"};
@@ -81,3 +95,29 @@ if ($pre) {
 	print "market closed!\n";
 }
 
+=pod
+
+=head1 USAGE
+
+	ticker.pl [-vh] [ticker1] [ticker2] ...
+
+where:
+
+	-v shows the version
+	-h shows this help message
+	[tickerX] is the ticker code e.g. AAPL, GOOG, AMZN etc.
+
+=head1 DESCRIPTION
+
+Fetches current price quotes using Yahoo's finance API and displays on the
+console. If no ticker is specified as argument it displays the default list.
+
+=head1 SOURCE
+
+	https://github.com/bukshee/ticker.pl
+
+=head1 LICENSE
+
+GPL-3
+
+=cut
