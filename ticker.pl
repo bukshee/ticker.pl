@@ -76,7 +76,7 @@ for my $h (@$co) {
 	$closed =$h->{'marketState'} eq 'CLOSED'?1:0;
 	$time = $h->{regularMarketTime};
 
-	my $prefix=($pre eq 'PRE' and exists $h->{'preMarketPrice'})?'pre':'regular';
+	my $prefix=($pre and exists $h->{'preMarketPrice'})?'pre':'regular';
 	my $price=$h->{"${prefix}MarketPrice"};
 	my $change=$h->{"${prefix}MarketChange"};
 	my $changep=$h->{"${prefix}MarketChangePercent"};
