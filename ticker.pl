@@ -9,7 +9,7 @@ use LWP::UserAgent ();
 use URI::Escape;
 use JSON::XS;
 
-my $VERSION='v1.0.0';
+my $VERSION='v1.0.1';
 my @symbols;
 
 my $opts={};
