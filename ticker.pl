@@ -74,25 +74,29 @@ for my $h (@$co) {
 
 	$pre =$h->{'marketState'} eq 'PRE'?1:0;
 	$closed =$h->{'marketState'} eq 'CLOSED'?1:0;
-	$time = $h->{regularMarketTime};
 
 	my $prefix=($pre and exists $h->{'preMarketPrice'})?'pre':'regular';
 	my $price=$h->{"${prefix}MarketPrice"};
+	if (!defined $price) {
+		next;
+	}
+	$time = $h->{regularMarketTime};
 	my $change=$h->{"${prefix}MarketChange"};
 	my $changep=$h->{"${prefix}MarketChangePercent"};
 	my $inc=$change>=0?'green':'red';
 	printf("%s%-10s%s%8.2f%s%10.2f %9s%s%s\n",
 		color('bold'),$h->{'symbol'},color('reset'),
 		$price,color($inc),$change,sprintf('(%.02f%%)',$changep),color('reset'),
-		$pre?' *':'');
+		$prefix eq 'pre'?' *':'');
 }
+if(!$time) { exit 0; }
 $ENV{'TZ'}=$tzname || 'America/New_York';
 tzset();
-printf "@ %s\n",strftime("%Y-%m-%d %H:%M:%S %Z",localtime($time));
 if ($pre) {
 	print "* means pre-market values\n";
-} elsif($closed){
-	print "market closed!\n";
+} else {
+	printf "@ %s\n",strftime("%Y-%m-%d %H:%M:%S %Z",localtime($time));
+	print "market closed!\n" if($closed);
 }
 
 =pod
